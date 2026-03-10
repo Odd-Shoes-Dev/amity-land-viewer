@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d1117" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Amity Land Viewer – Mbarara, Uganda</title>
+
+  <!-- Mapbox GL JS -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+  <!-- Token injected at build time; overridden by config.local.js in dev -->
+  <script src="config.js"></script>
+</head>
+<body>
+
+  <!-- ── Sidebar (drawer on mobile) ───────────────────────────── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <img src="amity-logo.jpeg" alt="Amity Realtors Ltd" class="logo-img" />
+      <div class="header-text">
+        <h1 class="app-title">Amity Land Viewer</h1>
+        <p class="app-subtitle">Demo · Mbarara, Uganda</p>
+      </div>
+      <!-- Close button: visible on mobile only -->
+      <button class="sidebar-close" id="sidebar-close" onclick="closeSidebar()" aria-label="Close menu">✕</button>
+    </div>
+
+    <section class="card">
+      <h2 class="card-title">
+        <span class="dot dot-green"></span>
+        Plot Details
+      </h2>
+      <ul class="detail-list">
+        <li><span class="label">Location</span><span class="value">Biharwe, Mbarara</span></li>
+        <li><span class="label">Plot Size</span><span class="value">50 × 100 ft</span></li>
+        <li><span class="label">Distance to Town</span><span class="value">7 km</span></li>
+        <li><span class="label">Electricity</span><span class="value badge badge-green">Available</span></li>
+        <li><span class="label">Water</span><span class="value badge badge-green">Available</span></li>
+        <li><span class="label">Title</span><span class="value badge badge-blue">Available</span></li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">
+        <span class="dot dot-yellow"></span>
+        Nearby Infrastructure
+      </h2>
+      <ul class="infra-list">
+        <li class="infra-item">
+          <span class="infra-icon">🛣️</span>
+          <span class="infra-name">Main Road</span>
+          <span class="infra-dist">400 m</span>
+        </li>
+        <li class="infra-item">
+          <span class="infra-icon">🛒</span>
+          <span class="infra-name">Trading Centre</span>
+          <span class="infra-dist">900 m</span>
+        </li>
+        <li class="infra-item">
+          <span class="infra-icon">🏫</span>
+          <span class="infra-name">School</span>
+          <span class="infra-dist">1.4 km</span>
+        </li>
+        <li class="infra-item">
+          <span class="infra-icon">🏥</span>
+          <span class="infra-name">Hospital</span>
+          <span class="infra-dist">2.1 km</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="card card-cta">
+      <p class="cta-text">Explore this plot</p>
+      <button class="btn-primary" onclick="flyToPlot()">📍 View on Map</button>
+      <button class="btn-drone" id="drone-btn" onclick="toggleDroneView()">
+        <span class="drone-icon">🚁</span>
+        <span id="drone-label">Drone View</span>
+      </button>
+      <button class="btn-stand" id="stand-btn" onclick="toggleStandMode()">
+        <span class="stand-icon">🧍</span>
+        <span id="stand-label">Stand On Your Land</span>
+      </button>
+    </section>
+
+    <footer class="sidebar-footer">
+      <p>Powered by <strong>Amity Realtors Ltd</strong></p>
+      <p class="footer-sub">Connecting the diaspora to home.</p>
+    </footer>
+  </aside>
+
+  <!-- ── Map container (map + floating UI) ────────────────────── -->
+  <div class="map-container">
+
+    <!-- Hamburger: visible on mobile only -->
+    <button class="menu-toggle" id="menu-toggle" onclick="toggleSidebar()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <!-- Dim overlay: tapping it closes the sidebar on mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <div id="map"></div>
+
+    <!-- ── Stand-on-Land HUD ─────────────────────────────────── -->
+    <div id="stand-hud" class="stand-hud hidden" aria-live="polite">
+      <div class="hud-top">
+        <span class="hud-ping"></span>
+        <div class="hud-title-block">
+          <p class="hud-title">Standing on Your Land</p>
+          <p class="hud-sub">Biharwe, Mbarara, Uganda</p>
+        </div>
+      </div>
+      <div class="hud-bottom">
+        <div class="hud-compass">
+          <svg class="compass-svg" viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="22" class="compass-ring"/>
+            <text x="24" y="9"  class="compass-label" text-anchor="middle">N</text>
+            <text x="24" y="43" class="compass-label" text-anchor="middle">S</text>
+            <text x="7"  y="28" class="compass-label" text-anchor="middle">W</text>
+            <text x="41" y="28" class="compass-label" text-anchor="middle">E</text>
+            <g id="compass-needle-group">
+              <polygon points="24,6 21,24 24,28 27,24" class="needle-north"/>
+              <polygon points="24,28 21,24 24,42 27,24" class="needle-south"/>
+            </g>
+          </svg>
+        </div>
+        <div class="hud-info">
+          <p class="hud-facing-label">Facing</p>
+          <p class="hud-facing-dir" id="hud-facing-dir">—</p>
+          <p class="hud-corner" id="hud-corner">—</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.map-container -->
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Loading your land parcel…</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

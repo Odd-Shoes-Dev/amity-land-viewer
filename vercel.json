@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "buildCommand": "sed -i \"s|MAPBOX_TOKEN_PLACEHOLDER|$MAPBOX_TOKEN|g\" config.js",
+  "outputDirectory": ".",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    }
+  ]
+}
