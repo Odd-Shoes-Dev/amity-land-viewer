@@ -524,20 +524,38 @@ body { display: flex; }
   .btn-drone,
   .btn-stand { min-height: 48px; font-size: 14px; padding: 13px 10px; }
 
-  /* HUD: full-width strip pinned to bottom, no transform centering */
+  /* HUD: fixed to viewport so browser chrome never obscures it */
   .stand-hud {
+    position: fixed;
     left: 12px;
     right: 12px;
-    bottom: 20px;
+    /* sit above browser nav bar; env() adds extra clearance on notched phones */
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
     transform: none;
     min-width: unset;
-    /* safe area padding for notched phones */
-    padding-bottom: max(14px, env(safe-area-inset-bottom));
+    /* tighter padding so all content fits on small screens */
+    padding: 10px 12px;
   }
   .stand-hud.hidden {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(16px);
   }
+
+  /* Compact HUD internals for mobile */
+  .hud-top {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    gap: 8px;
+  }
+  .hud-title { font-size: 12px; }
+  .hud-sub   { font-size: 10px; margin-top: 1px; }
+
+  .hud-bottom { gap: 12px; }
+  .compass-svg { width: 44px; height: 44px; }
+
+  .hud-facing-label { font-size: 9px; }
+  .hud-facing-dir   { font-size: 15px; }
+  .hud-corner       { font-size: 11px; margin-top: 2px; }
 
   /* Bigger popup text on mobile */
   .mapboxgl-popup-content { min-width: 200px !important; }
@@ -551,5 +569,7 @@ body { display: flex; }
 /* Very small phones */
 @media (max-width: 380px) {
   .sidebar { width: 92vw; }
-  .hud-facing-dir { font-size: 14px; }
+  .hud-facing-dir { font-size: 13px; }
+  .compass-svg    { width: 38px; height: 38px; }
+  .hud-top        { margin-bottom: 6px; padding-bottom: 6px; }
 }
