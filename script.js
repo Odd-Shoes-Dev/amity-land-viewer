@@ -515,6 +515,7 @@ map.on('load', animatePulse);
 
 // ── flyToPlot helper (called by sidebar button) ──────────────────
 function flyToPlot() {
+  closeSidebar();
   stopOrbit();
   stopStandMode();
   map.flyTo({
@@ -576,6 +577,7 @@ function stopOrbit() {
 }
 
 function toggleDroneView() {
+  closeSidebar();
   if (orbitActive) {
     stopOrbit();
   } else {
@@ -684,6 +686,7 @@ function stopStandMode() {
 }
 
 function toggleStandMode() {
+  closeSidebar();
   if (standActive) {
     stopStandMode();
   } else {
