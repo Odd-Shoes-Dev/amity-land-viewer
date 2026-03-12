@@ -524,38 +524,47 @@ body { display: flex; }
   .btn-drone,
   .btn-stand { min-height: 48px; font-size: 14px; padding: 13px 10px; }
 
-  /* HUD: fixed to viewport so browser chrome never obscures it */
+  /* ── HUD: fixed strip, always above Safari toolbar ───────────
+     iPhone SE has no notch → env(safe-area-inset-bottom) = 0.
+     Safari toolbar is ~44 px, so we floor bottom at 64 px with max()
+     to guarantee the card is never hidden behind browser chrome.   */
   .stand-hud {
     position: fixed;
     left: 12px;
     right: 12px;
-    /* sit above browser nav bar; env() adds extra clearance on notched phones */
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+    bottom: max(64px, calc(env(safe-area-inset-bottom, 0px) + 16px));
     transform: none;
     min-width: unset;
-    /* tighter padding so all content fits on small screens */
-    padding: 10px 12px;
+    padding: 10px 12px 10px;
+    border-radius: 12px;
   }
   .stand-hud.hidden {
     opacity: 0;
     transform: translateY(16px);
   }
 
-  /* Compact HUD internals for mobile */
+  /* ── Collapse top + bottom into one compact strip ─────────────
+     On mobile we reflow the HUD as:
+       [ping · title · location]  ←  single slim header row
+       [compass]  [Facing / Direction / Corner]  ← kept as-is
+     Removing the heavy separator keeps total card height ≤ 95 px.  */
   .hud-top {
-    margin-bottom: 8px;
-    padding-bottom: 8px;
-    gap: 8px;
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+    /* lighter separator */
+    border-bottom-color: rgba(48, 54, 61, 0.6);
+    gap: 7px;
   }
-  .hud-title { font-size: 12px; }
-  .hud-sub   { font-size: 10px; margin-top: 1px; }
+  .hud-ping { width: 8px; height: 8px; }
+  .hud-title { font-size: 11px; }
+  .hud-sub   { font-size: 10px; margin-top: 0; }
 
-  .hud-bottom { gap: 12px; }
-  .compass-svg { width: 44px; height: 44px; }
+  .hud-bottom { gap: 10px; align-items: center; }
+  .compass-svg { width: 40px; height: 40px; }
 
-  .hud-facing-label { font-size: 9px; }
-  .hud-facing-dir   { font-size: 15px; }
-  .hud-corner       { font-size: 11px; margin-top: 2px; }
+  .hud-facing-label { font-size: 9px; letter-spacing: 0.5px; margin-bottom: 1px; }
+  .hud-facing-dir   { font-size: 14px; line-height: 1; }
+  .hud-corner       { font-size: 10px; margin-top: 2px; }
 
   /* Bigger popup text on mobile */
   .mapboxgl-popup-content { min-width: 200px !important; }
@@ -566,10 +575,12 @@ body { display: flex; }
   .mapboxgl-ctrl-top-right { top: 12px; right: 12px; }
 }
 
-/* Very small phones */
+/* Very small phones (iPhone SE 1st gen: 320 × 568) */
 @media (max-width: 380px) {
-  .sidebar { width: 92vw; }
+  .sidebar        { width: 92vw; }
+  .compass-svg    { width: 36px; height: 36px; }
   .hud-facing-dir { font-size: 13px; }
-  .compass-svg    { width: 38px; height: 38px; }
-  .hud-top        { margin-bottom: 6px; padding-bottom: 6px; }
+  .hud-corner     { font-size: 10px; }
+  /* extra bottom clearance on the smallest screens */
+  .stand-hud      { bottom: max(68px, calc(env(safe-area-inset-bottom, 0px) + 16px)); }
 }
